@@ -1,69 +1,85 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Webpack library starter
 
-## Available Scripts
+Webpack based boilerplate for producing libraries (Input: ES6, Output: universal library)
 
-In the project directory, you can run:
+![Travis](https://travis-ci.org/krasimir/webpack-library-starter.svg?branch=master)
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+* Webpack 4 based.
+* ES6 as a source.
+* Exports in a [umd](https://github.com/umdjs/umd) format so your library works everywhere.
+* ES6 test setup with [Mocha](http://mochajs.org/) and [Chai](http://chaijs.com/).
+* Linting with [ESLint](http://eslint.org/).
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+## Process
 
-### `npm test`
+```
+ES6 source files
+       |
+       |
+    webpack
+       |
+       +--- babel, eslint
+       |
+  ready to use
+     library
+  in umd format
+```
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+*Have in mind that you have to build your library before publishing. The files under the `lib` folder are the ones that should be distributed.*
 
-### `npm run build`
+## Getting started
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Setting up the name of your library
+  * Open `webpack.config.js` file and change the value of `libraryName` variable.
+  * Open `package.json` file and change the value of `main` property so it matches the name of your library.
+2. Build your library
+  * Run `yarn install` (recommended) or `npm install` to get the project's dependencies
+  * Run `yarn build` or `npm run build` to produce minified version of your library.
+3. Development mode
+  * Having all the dependencies installed run `yarn dev` or `npm run dev`. This command will generate an non-minified version of your library and will run a watcher so you get the compilation on file change.
+4. Running the tests
+  * Run `yarn test` or `npm run test`
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Scripts
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* `yarn build` or `npm run build` - produces production version of your library under the `lib` folder
+* `yarn dev` or `npm run dev` - produces development version of your library and runs a watcher
+* `yarn test` or `npm run test` - well ... it runs the tests :)
+* `yarn test:watch` or `npm run test:watch` - same as above but in a watch mode
 
-### `npm run eject`
+## Readings
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+* [Start your own JavaScript library using webpack and ES6](http://krasimirtsonev.com/blog/article/javascript-library-starter-using-webpack-es6)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Misc
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### An example of using dependencies that shouldn’t be resolved by webpack, but should become dependencies of the resulting bundle
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+In the following example we are excluding React and Lodash:
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
-# react-ccNetViz
+```js
+{
+  devtool: 'source-map',
+  output: {
+    path: '...',
+    libraryTarget: 'umd',
+    library: '...'
+  },
+  entry: '...',
+  ...
+  externals: {
+    react: 'react'
+    // Use more complicated mapping for lodash.
+    // We need to access it differently depending
+    // on the environment.
+    lodash: {
+      commonjs: 'lodash',
+      commonjs2: 'lodash',
+      amd: '_',
+      root: '_'
+    }
+  }
+}
+```
